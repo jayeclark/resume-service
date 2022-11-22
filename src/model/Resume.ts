@@ -10,7 +10,7 @@ interface Conditions {
 }
 
 export interface ItemVariant extends Record<string, any>{
-  content: string;
+  variant: string;
   keywords?: string[];
   industries?: Industry[]
   excludeConditions?: Conditions;
@@ -62,14 +62,14 @@ export interface RankedSectionElement extends SectionElement {
   rankingStrategy: "totalRank" | "averageRank"
 }
 
-interface Job extends SectionElement {}
-interface Project extends SectionElement {}
-interface Degree extends SectionElement {}
-interface Skill extends SectionElement {
+export interface Job extends SectionElement {}
+export interface Project extends SectionElement {}
+export interface Degree extends SectionElement {}
+export interface Skill extends SectionElement {
   category: 'skill';
   yoe: number;
 }
-interface Certification extends SectionElement {
+export interface Certification extends SectionElement {
   category: 'certification',
   expires?: Date
 }
@@ -79,7 +79,7 @@ export type Projects = Project[]
 export type Education = Degree[]
 export type ResumeSectionContent = Experience | Education | SkillsAndCertifications | Projects;
 
-interface ResumeSection extends ItemWithConditions {
+export interface ResumeSection extends ItemWithConditions {
   type: 'Experience' | 'Education' | 'SkillsAndCertifiations' | 'Projects'
   content: ResumeSectionContent
   sumOfTotalRank?: number;

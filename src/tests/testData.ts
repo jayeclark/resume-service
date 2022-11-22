@@ -1,4 +1,4 @@
-import { ExternalLinks, AccomplishmentCategory, Resume, Experience, ItemVariant } from "../model/Resume";
+import { ExternalLinks, AccomplishmentCategory, Resume, Experience, ItemVariant, Item, Job } from "../model/Resume";
 import { Industry, RawJobDescription } from "../model/JobDescription";
 
 export function generateTestJobDescription(): RawJobDescription {
@@ -41,25 +41,25 @@ export function generateTestJobDescription(): RawJobDescription {
 const AMZN_refundAuditor: AccomplishmentCategory = {
   id: "refund-auditor",
   variants: [
-    { content: "Kotlin, AWS Lambda & DynamoDB auditing service project for automated refunds"}
+    { variant: "Kotlin, AWS Lambda & DynamoDB auditing service project for automated refunds"}
   ],
   items: [
     { 
       id: "refund-auditor-1",
       variants: [{
-        content: "Launched three SLA audits applied in near-real-time to 525K+ automated grocery delivery order refunds per year",
+        variant: "Launched three SLA audits applied in near-real-time to 525K+ automated grocery delivery order refunds per year",
       }]
     },
     { 
       id: "refund-auditor-2",
       variants: [
-        { content: "Expanded audit ticketing to include configurable reports & publishing to S3, saving ~$44,000 in future labor costs" }
+        { variant: "Expanded audit ticketing to include configurable reports & publishing to S3, saving ~$44,000 in future labor costs" }
       ]
     },
     { 
       id: "refund-auditor-3",
       variants: [{
-        content: "Designed machine learning audit plugins capable of generating up to $10M in cost savings",
+        variant: "Designed machine learning audit plugins capable of generating up to $10M in cost savings",
       }]
     },
   ]
@@ -68,13 +68,13 @@ const AMZN_refundAuditor: AccomplishmentCategory = {
 const AMZN_eventDrivenInsightGeneration: AccomplishmentCategory = {
   id: "amazon-2",
   variants: [
-    { content: "Java, Gremlin & AWS Neptune Graph Database Insight Generation"}
+    { variant: "Java, Gremlin & AWS Neptune Graph Database Insight Generation"}
   ],
   items: [
     {
       id: "amazon-2-1",
       variants: [{
-        content: "Built prototype AWS Lambda & SNS graph stream event trigger system capable of processing 1M events per hour"
+        variant: "Built prototype AWS Lambda & SNS graph stream event trigger system capable of processing 1M events per hour"
       }]
     }
   ]
@@ -83,48 +83,48 @@ const AMZN_eventDrivenInsightGeneration: AccomplishmentCategory = {
 const AMZN_orderRateMonitoring: AccomplishmentCategory = {
   id: "amazon-3",
   variants: [
-    { content: "Typescript/Node.js, Java/Apache Flink, AWS Sagemaker multimodel Inference time series anomaly detection w/React UI", keywords: [""], industries: [] as Industry[]}
+    { variant: "Typescript/Node.js, Java/Apache Flink, AWS Sagemaker multimodel Inference time series anomaly detection w/React UI", keywords: [""], industries: [] as Industry[]}
   ],
   items: [{
     id: "amazon-3-1",
     variants: [
-      {content: "Updated source code, developed ops runbook, communicated with stakeholders, and led training for handoff of order rate anomaly tech triage from telemetry on call to 24/7 consumer tech services team"}
+      {variant: "Updated source code, developed ops runbook, communicated with stakeholders, and led training for handoff of order rate anomaly tech triage from telemetry on call to 24/7 consumer tech services team"}
     ]
   }]
 }
 
-const operationalExcellence_cdkUpgrades = {
+const operationalExcellence_cdkUpgrades: Item = {
   id: "cdkUpgrades",
   variants: [
-    { content: "Upgraded, refactored & standardized CloudFormation architecture to AWS CDK V2 on 14 deployment pipelines" }
+    { variant: "Upgraded, refactored & standardized CloudFormation architecture to AWS CDK V2 on 14 deployment pipelines" }
   ]
 }
 
-const operationalExcellence_onCallVelocity = {
+const operationalExcellence_onCallVelocity: Item = {
   id: "onCallVelocity",
   variants: [
-    { content: "Joined on-call rotation 60 days ahead of schedule, debugged & recovered service on Tier 1.5 and Tier 2 outages" }
+    { variant: "Joined on-call rotation 60 days ahead of schedule, debugged & recovered service on Tier 1.5 and Tier 2 outages" }
   ]
 }
 
-const operationalExcellence_pipelineBlocks = {
+const operationalExcellence_pipelineBlocks: Item = {
   id: "pipelineBlocks",
   variants: [
-    { content: "Reduced CI/CD pipeline block ticket time from 9.4 to 1.7 days & resolved 471 issues (stories + trouble tickets)" }
+    { variant: "Reduced CI/CD pipeline block ticket time from 9.4 to 1.7 days & resolved 471 issues (stories + trouble tickets)" }
   ]
 }
 
-const operationalExcellence_pullRequestCount = {
+const operationalExcellence_pullRequestCount: Item = {
   id: "pullRequestCount",
   variants: [
-    { content: "Merged 136 pull requests in Typescript, Java, Kotlin, Python & shell script - 100,000+ lines of code changed" }
+    { variant: "Merged 136 pull requests in Typescript, Java, Kotlin, Python & shell script - 100,000+ lines of code changed" }
   ]
 }
 
 const AMZN_operationalExcellence: AccomplishmentCategory = {
   id: "amazon-4",
   variants: [
-    { content: "Operational Excellence", keywords: [""], industries: [] as Industry[]}
+    { variant: "Operational Excellence", keywords: [""], industries: [] as Industry[]}
   ],
   items: [operationalExcellence_cdkUpgrades, operationalExcellence_onCallVelocity, operationalExcellence_pipelineBlocks, operationalExcellence_pullRequestCount]
 }
@@ -142,78 +142,82 @@ const AMZN = {
   ]
 }
 
-const pareto_pullRequestCount = {
+const pareto_pullRequestCount: Item = {
   id: "pullRequestCount",
   variants: [
-    { content: "Merged 50 pull requests representing more than 200 commits" }
+    { variant: "Merged 50 pull requests representing more than 200 commits" }
   ]
 }
 
-const pareto_CICD = {
+const pareto_CICD: Item = {
   id: "cicd",
   variants: [
-    { content: "Set up full CI/CD pipeline with unit tests, integration tests, code quality checks, and test deployments" }
+    { variant: "Set up full CI/CD pipeline with unit tests, integration tests, code quality checks, and test deployments" }
   ]
 }
 
-const pareto_paidMaintainer = {
+const pareto_paidMaintainer: Item = {
   id: "paidMaintainer",
   variants: [
-    { content: "Served as paid maintainer and volunteer engineering manager on project, attracting 15 volunteer contributors" }
+    { variant: "Served as paid maintainer and volunteer engineering manager on project, attracting 15 volunteer contributors" }
   ]
 }
 
-const pareto_codeQuality = {
+const pareto_codeQuality: Item = {
   id: "codeQuality",
   variants: [
-    { content: "Established and documented repository coding standards, issue templates, issue labeling practices, and testing policies" }
+    { variant: "Established and documented repository coding standards, issue templates, issue labeling practices, and testing policies" }
   ]
 }
 
-const OSS_Pareto = {
+const OSS_Pareto: AccomplishmentCategory = {
   id: "oss_pareto",
   variants: [
-    { content: "React, AWS API Gateway, Websocket, Serverless Node.js & Vercel based Mentorship Platform" }
+    { variant: "React, AWS API Gateway, Websocket, Serverless Node.js & Vercel based Mentorship Platform" }
   ],
   items: [ pareto_pullRequestCount, pareto_CICD, pareto_paidMaintainer, pareto_codeQuality]
 }
 
-const education_courses = {
+const education_courses: Item = {
   id: "education_certifications",
   variants: [
-    { content: "Completed a comprehensive program of self-study in CS including data structures & algorithms, math for machine learning, and system design"}
+    { variant: "Completed a comprehensive program of self-study in CS including data structures & algorithms, math for machine learning, and system design"}
   ]
 }
 
-const education_certifications = {
+const education_certifications: Item = {
   id: "education_certifications",
   variants: [
-    { content: "Completed professional certificates in data science (18 months), full stack development (10 months), and machine learning (11 weeks)"}
+    { variant: "Completed professional certificates in data science (18 months), full stack development (10 months), and machine learning (11 weeks)"}
   ]
 }
 
-const OSS_Education = {
+const OSS_Education: AccomplishmentCategory = {
   id: "oss_education",
   variants: [
-    { content: "MIT xPro, HarvardX, and Open Courseware"}
+    { variant: "MIT xPro, HarvardX, and Open Courseware"}
   ],
   items: [education_certifications, education_courses]
 }
 
-const OSS_RailsDevs = {
+const OSS_RailsDevs: AccomplishmentCategory = {
   id: "oss_railsdevs",
   variants: [] as ItemVariant[],
   items: [
     {
       id: "railsdevs",
       variants: [{
-        content: "Implemented notification system for Ruby on Rails/Postgres based reverse job board"
+        variant: "Implemented notification system for Ruby on Rails/Postgres based reverse job board"
       }]
     }
   ]
 }
 
-const OSS = {
+const OSS: Job = {
+  id: "oss",
+  variants: [
+    { variant: "OSS Sabbatical & Educational Break"}
+  ],
   entity: "",
   role: "OSS Sabbatical & Educational Break",
   start: new Date("2020-08-20"),
@@ -221,44 +225,48 @@ const OSS = {
   accomplishments: [ OSS_Pareto, OSS_Education, OSS_RailsDevs]
 }
 
-const OPG_general = {
+const OPG_general: AccomplishmentCategory = {
   id: "opg_general",
   variants: [] as ItemVariant[],
   items: [
     {
       id: "devTeam",
       variants: [{
-        content: "Led 4-person dev team (and participated as IC) to build a b2b data analytics platform for Twitch streaming media built on Scala, Spring, PostgreSQL and Redis"
+        variant: "Led 4-person dev team (and participated as IC) to build a b2b data analytics platform for Twitch streaming media built on Scala, Spring, PostgreSQL and Redis"
       }]
     },
     {
       id: "microservices",
       variants: [{
-        content: "Built message-based microservices & REST API integrations for calendar, payday loans, & sponsored content"
+        variant: "Built message-based microservices & REST API integrations for calendar, payday loans, & sponsored content"
       }]
     },
     {
       id: "machineLearning",
       variants: [{
-        content: "Developed a machine learning driven talent management SaaS, processing $20M+ in sponsored content payments"
+        variant: "Developed a machine learning driven talent management SaaS, processing $20M+ in sponsored content payments"
       }]
     },
     {
       id: "amazonAppStore",
       variants: [{
-        content: "Debugged tablet streaming & embedded software issues for mobile esports events with the Amazon App Store "
+        variant: "Debugged tablet streaming & embedded software issues for mobile esports events with the Amazon App Store "
       }]
     },
     {
       id: "partnerships",
       variants: [{
-        content: "Led successful technical collaborations with industry partners at Facebook, Microsoft, NVIDIA, Intel & Twitch"
+        variant: "Led successful technical collaborations with industry partners at Facebook, Microsoft, NVIDIA, Intel & Twitch"
       }]
     },
   ]
 }
 
-const OPG = {
+const OPG: Job = {
+  id: 'online-performers-group',
+  variants: [
+    { variant: "Co-founder & Acting CTO"}
+  ],
   entity: "Online Performers Group",
   role: "Co-founder & Acting CTO",
   start: new Date("2015-09-01"),
@@ -266,20 +274,26 @@ const OPG = {
   accomplishments: [OPG_general]
 }
 
-const BARTELL_general = {
+const BARTELL_general: AccomplishmentCategory = {
   id: "bartell_general",
   variants: [] as ItemVariant[],
   items: [
     {
       id: "bartell-webapp",
       variants: [{
-        content: "Developed PHP & MySQL dispatch & real-time IoT GPS tracking app with geofencing + adverse incident reporting, tracking fleet location & passengers for an airport shuttle service with more than 2M riders per year."
+        variant: "Developed PHP & MySQL dispatch & real-time IoT GPS tracking app with geofencing + adverse incident reporting, tracking fleet location & passengers for an airport shuttle service with more than 2M riders per year."
       }]
     }
   ]
 }
 
-const BARTELL = {
+const BARTELL: Job = {
+  id: "bartell",
+  variants: [
+    { variant: "Technical Consultant" },
+    { variant: "Consultant" },
+    { variant: "Technical & Data Consultant"}
+  ],
   entity: "Bartell & Associates",
   role: "Technical & Data Consultant",
   start: new Date("2013-08-01"),
@@ -313,11 +327,11 @@ export function generateTestResume(): Resume {
         type: 'Experience',
         id: "experience",
         variants: [
-          { content: ""}
+          { variant: ""}
         ],
         content: [
           AMZN, OSS, OPG, BARTELL
-        ] as Experience
+        ] as Job[]
       }
     ]
   }

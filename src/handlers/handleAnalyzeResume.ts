@@ -89,7 +89,7 @@ export class HandleAnalyzeResume {
   }
 
   private convertItemVariantToRankedItemVariant(itemOption: ItemVariant): RankedItemVariant {
-    const optionContentKeywordArray = removeStopwords(itemOption.content.split(' ').map((word) => word.toLowerCase()), eng);
+    const optionContentKeywordArray = removeStopwords(itemOption.variant.split(' ').map((word) => word.toLowerCase()), eng);
     let totalPoints = 0;
     let matchedWords = 0;
 
