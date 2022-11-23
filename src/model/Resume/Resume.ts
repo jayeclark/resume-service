@@ -1,4 +1,4 @@
-import { Industry } from "./JobDescription";
+import { Industry } from "../JobDescription";
 
 // TODO: Add id string patterns
 type id = string;
@@ -38,7 +38,7 @@ export interface RankedItem extends Item {
 
 export interface BulletPoint extends Item {}
 
-interface ItemWithConditions extends Item {
+export interface ItemWithConditions extends Item {
   excludeConditions?: Conditions
   includeConditions?: Conditions
 }
@@ -77,15 +77,9 @@ export type Experience = Job[]
 export type SkillsAndCertifications = (Skill | Certification)[]
 export type Projects = Project[]
 export type Education = Degree[]
-export type ResumeSectionContent = Experience | Education | SkillsAndCertifications | Projects;
+export type ResumeSectionEntries = Experience | Education | SkillsAndCertifications | Projects;
 
-export interface ResumeSection extends ItemWithConditions {
-  type: 'Experience' | 'Education' | 'SkillsAndCertifiations' | 'Projects'
-  content: ResumeSectionContent
-  sumOfTotalRank?: number;
-  averageOfTotalRank?: number;
-  averageRank?: number;
-}
+
 
 export enum ExternalLinks {
   GitHub,

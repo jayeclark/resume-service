@@ -1,6 +1,6 @@
 import { PutObjectCommand, GetObjectCommand, HeadBucketCommand, CreateBucketCommand } from "@aws-sdk/client-s3";
 import { s3Client } from "./s3Client";
-import { Resume } from "../../model/Resume";
+import { Resume } from "../../model/Resume/Resume";
 import { validateResumeAndConvertToJSONString } from "./dto";
 
 const BUCKET_NAME = `mydevinterview-resume-service-${process.env.STAGE}-${process.env.region}`;

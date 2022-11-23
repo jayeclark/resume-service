@@ -1,5 +1,5 @@
 import { removeStopwords, eng } from "stopword";
-import { AccomplishmentCategory, Item, ItemVariant, RankedItem, RankedItemVariant, RankedSectionElement, Resume, ResumeSectionContent, SectionElement } from "../model/Resume";
+import { AccomplishmentCategory, Item, ItemVariant, RankedItem, RankedItemVariant, RankedSectionElement, Resume, ResumeSectionEntries, SectionElement } from "../model/Resume/Resume";
 import { KeywordsMap } from "../model/Keywords";
 
 export class HandleAnalyzeResume {
@@ -28,7 +28,7 @@ export class HandleAnalyzeResume {
     return this.processedResume;
   }
 
-  getSectionAnalysis(content: ResumeSectionContent) {
+  getSectionAnalysis(content: ResumeSectionEntries) {
     return content.map(this.getSectionElementAnalysis);
   }
 

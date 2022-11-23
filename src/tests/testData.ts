@@ -1,4 +1,4 @@
-import { ExternalLinks, AccomplishmentCategory, Resume, Experience, ItemVariant, Item, Job } from "../model/Resume";
+import { ExternalLinks, AccomplishmentCategory, Resume, Experience, ItemVariant, Item, Job } from "../model/Resume/Resume";
 import { Industry, RawJobDescription } from "../model/JobDescription";
 
 export function generateTestJobDescription(): RawJobDescription {
