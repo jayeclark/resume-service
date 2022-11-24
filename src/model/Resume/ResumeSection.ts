@@ -1,4 +1,5 @@
-import { ItemWithConditions, ResumeSectionEntries } from "./Resume";
+import { ItemWithConditions } from "./Resume";
+import { ResumeSectionEntries } from "./ResumeSectionEntry";
 
 export interface ResumeSection extends ItemWithConditions {
   type: 'Experience' | 'Education' | 'SkillsAndCertifiations' | 'Projects'
