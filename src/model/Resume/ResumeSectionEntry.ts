@@ -1,6 +1,6 @@
 import { Item, AccomplishmentCategory } from "./Resume";
 
-export interface SectionElement extends Item {
+export interface SectionEntry extends Item {
   entity: string;
   role: string;
   start: Date | null;
@@ -8,25 +8,34 @@ export interface SectionElement extends Item {
   accomplishments: AccomplishmentCategory[] | null
 }
 
-export interface RankedSectionElement extends SectionElement {
+export interface RankedSectionEntry extends SectionEntry {
   bestRankingVariantIndex: number;
   overallRank: number
   rankingStrategy: "totalRank" | "averageRank"
 }
 
-export interface Job extends SectionElement {}
-export interface Project extends SectionElement {}
-export interface Degree extends SectionElement {}
-export interface Skill extends SectionElement {
+export interface Job extends SectionEntry { }
+export interface RankedJob extends RankedSectionEntry { }
+
+export interface Project extends SectionEntry { }
+export interface RankedProject extends RankedSectionEntry{ }
+
+export interface Degree extends SectionEntry { }
+export interface RankedDegree extends RankedSectionEntry { }
+export interface Skill extends SectionEntry {
   category: 'skill';
   yoe: number;
 }
-export interface Certification extends SectionElement {
+export interface RankedSkill extends RankedSectionEntry { }
+export interface Certification extends SectionEntry {
   category: 'certification',
   expires?: Date
 }
-export type Experience = Job[]
-export type SkillsAndCertifications = (Skill | Certification)[]
-export type Projects = Project[]
-export type Education = Degree[]
+export interface RankedCertification extends RankedSectionEntry { }
+
+
+export type Experience = (Job | RankedJob)[]
+export type SkillsAndCertifications = (Skill | Certification | RankedSkill | RankedCertification)[]
+export type Projects = (Project | RankedProject)[]
+export type Education = (Degree | RankedDegree)[]
 export type ResumeSectionEntries = Experience | Education | SkillsAndCertifications | Projects;
