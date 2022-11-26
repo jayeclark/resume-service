@@ -3,6 +3,7 @@ import { expect } from "chai";
 import { generateTestJobDescription, generateTestResume } from "../testData";
 import { HandleAnalyzeJobDescription } from "../../handlers/handleAnalyzeJobDescription";
 import { HandleAnalyzeResume } from "../../handlers/handleAnalyzeResume";
+import { RankedItem } from "../../model/Resume/Resume";
 
 describe('', () => {
   it('process resume as expected', () => {
@@ -23,12 +24,12 @@ describe('', () => {
     const resumeAnalyzer = new HandleAnalyzeResume(resume, map);
     //console.log(resumeAnalyzer);
 
-    const resumeSectionElement = resume.sections[0].content[0];
-    const sectionElementAnalysis = resumeAnalyzer.getSectionElementAnalysis(resumeSectionElement);
-    console.log("sectionElementAnalysis")
-    console.log(sectionElementAnalysis)
-    const { variants, bestRankingVariantIndex } = sectionElementAnalysis.accomplishments[0].items[0];
-    const items = sectionElementAnalysis.accomplishments[0].items;
+    const resumeSectionEntry = resume.sections[0].content[0];
+    const sectionEntryAnalysis = resumeAnalyzer.getSectionEntryAnalysis(resumeSectionEntry);
+    console.log("sectionEntryAnalysis")
+    console.log(sectionEntryAnalysis)
+    const { variants, bestRankingVariantIndex } = sectionEntryAnalysis.accomplishments[0].items[0];
+    const items: RankedItem[] = sectionEntryAnalysis.accomplishments[0].items as RankedItem[];
     const sortedVariants = items.sort((a, b) => b.bestRankingVariantPoints - a.bestRankingVariantPoints);
     console.log("sorted variants"
     )

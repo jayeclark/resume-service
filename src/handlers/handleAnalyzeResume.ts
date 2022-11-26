@@ -1,5 +1,6 @@
 import { removeStopwords, eng } from "stopword";
-import { AccomplishmentCategory, Item, ItemVariant, RankedItem, RankedItemVariant, RankedSectionElement, Resume, ResumeSectionEntries, SectionElement } from "../model/Resume/Resume";
+import { AccomplishmentCategory, Item, ItemVariant, RankedItem, RankedItemVariant, Resume } from "../model/Resume/Resume";
+import { ResumeSectionEntries, RankedSectionEntry, SectionEntry } from "../model/Resume/ResumeSectionEntry";
 import { KeywordsMap } from "../model/Keywords";
 
 export class HandleAnalyzeResume {
@@ -29,26 +30,26 @@ export class HandleAnalyzeResume {
   }
 
   getSectionAnalysis(content: ResumeSectionEntries) {
-    return content.map(this.getSectionElementAnalysis);
+    return content.map(this.getSectionEntryAnalysis);
   }
 
-  getSectionElementAnalysis(sectionElement: SectionElement) {
-    const rankedSectionElement = this.convertSectionElementAccomplishmentsToRankedAccomplishments(sectionElement);
-    console.log(rankedSectionElement);
-    //const rankedElement: SectionElement = this.convertItemToRankedItem(sectionElement) as SectionElement;
-    //const accomplishmentRankTally = this.tallySectionElementRankings(rankedElement);
-    //const rankedSectionElement: RankedSectionElement = {
-    //  ...rankedElement as RankedSectionElement,
+  getSectionEntryAnalysis(sectionEntry: SectionEntry) {
+    const rankedSectionEntry = this.convertSectionEntryAccomplishmentsToRankedAccomplishments(sectionEntry);
+    console.log(rankedSectionEntry);
+    //const rankedElement: SectionEntry = this.convertItemToRankedItem(sectionEntry) as SectionEntry;
+    //const accomplishmentRankTally = this.tallySectionEntryRankings(rankedElement);
+    //const rankedSectionEntry: RankedSectionEntry = {
+    //  ...rankedElement as RankedSectionEntry,
     //  overallRank: accomplishmentRankTally.overallRank,
     //  rankingStrategy: accomplishmentRankTally.rankingStrategy
     //}
-    return rankedSectionElement;
+    return rankedSectionEntry;
   }
 
-  convertSectionElementAccomplishmentsToRankedAccomplishments(sectionElement: SectionElement) {
+  convertSectionEntryAccomplishmentsToRankedAccomplishments(sectionEntry: SectionEntry) {
     return {
-      ...sectionElement,
-      accomplishments: sectionElement.accomplishments.map((item, i) => {
+      ...sectionEntry,
+      accomplishments: sectionEntry.accomplishments.map((item: Item, i: number) => {
         const converted = this.convertItemToRankedItem(item);
         return converted;
       })
@@ -107,10 +108,10 @@ export class HandleAnalyzeResume {
     return rankedItemOption;
   }
 
-  tallySectionElementRankings(sectionElement: SectionElement): { overallRank: number, rankingStrategy: "totalRank" | "averageRank" } {
+  tallySectionEntryRankings(sectionEntry: SectionEntry): { overallRank: number, rankingStrategy: "totalRank" | "averageRank" } {
     let totalRank = 0;
     let rankEntries = 0;
-    sectionElement.accomplishments.forEach((accomplishmentCategory: AccomplishmentCategory) => {
+    sectionEntry.accomplishments.forEach((accomplishmentCategory: AccomplishmentCategory) => {
       const bestRankingCategoryVariantIndex = accomplishmentCategory.bestRankingVariantIndex;
       totalRank += accomplishmentCategory.variants[bestRankingCategoryVariantIndex][this.rankingPolicy];
       rankEntries += 1;
