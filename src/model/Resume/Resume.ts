@@ -29,7 +29,6 @@ export interface Item {
   id: string;
   variants: ItemVariant[] | RankedItemVariant[]
   bestRankingVariantIndex?: number
-  items?: Item[] | RankedItem[]
 }
 
 export interface RankedItem extends Item {
@@ -37,16 +36,17 @@ export interface RankedItem extends Item {
   bestRankingVariantPoints: number;
 }
 
-export interface BulletPoint extends Item {}
+export interface BulletPoint extends Item {
+  itemCategory?: [number, string];
+  itemCategoryDisplayRequired: boolean;
+}
 
 export interface ItemWithConditions extends Item {
   excludeConditions?: Conditions
   includeConditions?: Conditions
 }
 
-export interface AccomplishmentCategory extends ItemWithConditions {
-  items: BulletPoint[]
-}
+
 
 export enum ExternalLinks {
   GitHub,
