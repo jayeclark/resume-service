@@ -1,11 +1,13 @@
-import { Item, AccomplishmentCategory } from "./Resume";
+import { Item, ItemWithConditions, BulletPoint } from "./Resume";
 
+export interface ItemCategory extends ItemWithConditions {}
 export interface SectionEntry extends Item {
   entity: string;
   role: string;
   start: Date | null;
   end: Date | null;
-  accomplishments: AccomplishmentCategory[] | null
+  items: BulletPoint[];
+  itemCategories: ItemCategory[];
 }
 
 export interface RankedSectionEntry extends SectionEntry {
