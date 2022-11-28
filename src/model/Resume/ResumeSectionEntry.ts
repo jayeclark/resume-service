@@ -1,13 +1,14 @@
-import { Item, ItemWithConditions, BulletPoint } from "./Resume";
+import { Item, BulletPoint, RankedBulletPoint, RankedItem } from "./Item";
 
-export interface ItemCategory extends ItemWithConditions {}
+export interface ItemCategory extends Item { }
+export interface RankedItemCategory extends RankedItem { }
 export interface SectionEntry extends Item {
   entity: string;
   role: string;
   start: Date | null;
   end: Date | null;
-  items: BulletPoint[];
-  itemCategories: ItemCategory[];
+  items: BulletPoint[] | RankedBulletPoint[];
+  itemCategories: ItemCategory[] | RankedItemCategory[];
 }
 
 export interface RankedSectionEntry extends SectionEntry {
