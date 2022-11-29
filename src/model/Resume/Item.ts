@@ -33,6 +33,7 @@ export interface RankedItemVariantObject extends ItemVariantObject {
 }
 
 export interface RankedItem extends Item {
+  variants: RankedItemVariantObject[];
   bestRankingVariantIndex: number;
 }
 

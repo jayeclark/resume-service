@@ -2,6 +2,7 @@ import { Item, BulletPoint, RankedBulletPoint, RankedItem } from "./Item";
 
 export interface ItemCategory extends Item { }
 export interface RankedItemCategory extends RankedItem { }
+
 export interface SectionEntry extends Item {
   entity: string;
   role: string;
