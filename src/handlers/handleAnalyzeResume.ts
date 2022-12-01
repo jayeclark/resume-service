@@ -50,7 +50,7 @@ export class HandleAnalyzeResume {
   convertSectionEntryItemCategoriesToRankedItemCategories(sectionEntry: SectionEntry) {
     return {
       ...sectionEntry,
-      accomplishments: sectionEntry.itemCategories.map((item: Item, i: number) => {
+      itemCategories: sectionEntry.itemCategories.map((item: Item, i: number) => {
         const converted = this.convertItemToRankedItem(item);
         return converted;
       })
