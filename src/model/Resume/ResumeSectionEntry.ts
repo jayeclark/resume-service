@@ -9,7 +9,7 @@ export interface SectionEntry extends Item {
   start: Date | null;
   end: Date | null;
   items: BulletPoint[] | RankedBulletPoint[];
-  itemCategories: ItemCategory[] | RankedItemCategory[];
+  itemCategories?: ItemCategory[] | RankedItemCategory[];
 }
 
 export interface RankedSectionEntry extends SectionEntry {
