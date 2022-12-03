@@ -31,12 +31,12 @@ export class HandleAnalyzeResume {
   }
 
   getSectionAnalysis(content: ResumeSectionEntries) {
-    return content.map(this.getSectionEntryAnalysis);
+    return content.map(this.getSectionEntryAnalysis) as ResumeSectionEntries;
   }
 
   getSectionEntryAnalysis(sectionEntry: SectionEntry) {
-    const rankedSectionEntry = this.convertSectionEntryItemCategoriesToRankedItemCategories(sectionEntry);
-    console.log(rankedSectionEntry);
+    const rankedSectionEntry = this.convertItemToRankedItem(sectionEntry);
+    console.log(rankedSectionEntry)
     //const rankedElement: SectionEntry = this.convertItemToRankedItem(sectionEntry) as SectionEntry;
     //const accomplishmentRankTally = this.tallySectionEntryRankings(rankedElement);
     //const rankedSectionEntry: RankedSectionEntry = {
@@ -47,46 +47,61 @@ export class HandleAnalyzeResume {
     return rankedSectionEntry;
   }
 
-  convertSectionEntryItemCategoriesToRankedItemCategories(sectionEntry: SectionEntry) {
-    return {
-      ...sectionEntry,
-      itemCategories: sectionEntry.itemCategories.map((item: Item, i: number) => {
-        const converted = this.convertItemToRankedItem(item);
-        return converted;
-      })
-    }
+  private convertItemsToRankedItems(items: BulletPoint[] | ItemCategory[]) {
+    return items.map((item) => this.convertItemToRankedItem(item))
+        .sort(this.rankingPolicy === 'totalRank' ? sortInDescendingOrderOfBestRankingVariantTotalPoints : sortInDescendingOrderOfBestRankingVariantAveragePoints);
   }
 
   convertItemToRankedItem(item: Item): RankedItem {
-    let bestRankingVariantIndex = -1;
-    let bestRankingVariantPoints = 0;
 
-    const rankedItemVariants = item.variants.map((variant, index) => {
-      const rankedItemVariant: RankedItemVariantObject = this.convertItemVariantToRankedItemVariant(variant);
-      if (rankedItemVariant[this.rankingPolicy] >= bestRankingVariantPoints) {
-        bestRankingVariantPoints = rankedItemVariant[this.rankingPolicy];
-        bestRankingVariantIndex = index;
-      }
-      return rankedItemVariant;
-    });
+    const rankedItemVariants = this.rankItemVariants(item.variants);
+    const bestRankingVariantIndex = this.getBestRankingItemVariantIndex(rankedItemVariants);
 
     const rankedItem: RankedItem = {
       ...item,
       variants: rankedItemVariants,
       bestRankingVariantIndex
     }
+
     if ("items" in rankedItem) {
-      rankedItem.items = (rankedItem.items as BulletPoint[]).map((item) => {
-        const converted = this.convertItemToRankedItem(item)
-        return converted
-      }).sort(this.rankingPolicy === 'totalRank' ? sortInDescendingOrderOfBestRankingVariantTotalPoints : sortInDescendingOrderOfBestRankingVariantAveragePoints);
+      rankedItem.items = this.convertItemsToRankedItems(rankedItem.items as BulletPoint[]);
     }
     if ("itemCategories" in rankedItem) {
-      rankedItem.itemCategories = (rankedItem.itemCategories as ItemCategory[])
-        .map(this.convertItemToRankedItem)
-        .sort(this.rankingPolicy === 'totalRank' ? sortInDescendingOrderOfBestRankingVariantTotalPoints : sortInDescendingOrderOfBestRankingVariantAveragePoints);
+      rankedItem.itemCategories = this.convertItemsToRankedItems(rankedItem.itemCategories as ItemCategory[]);
     }
+
     return rankedItem;
+  }
+
+  private rankItemVariants(itemVariants: (ItemVariantObject | RankedItemVariantObject | string)[]) {
+    return itemVariants.map((variant) => this.convertItemVariantToRankedItemVariant(variant));
+  }
+
+  private getBestRankingItemVariantIndex(itemVariants: RankedItemVariantObject[]) {
+    let bestRankingVariants: number[] = [];
+    let bestRankingVariantPoints = 0;
+
+    itemVariants.map((variantObject, index) => {
+      if (variantObject[this.rankingPolicy] === bestRankingVariantPoints) {
+        bestRankingVariants.push(index);
+      }
+      if (variantObject[this.rankingPolicy] > bestRankingVariantPoints) {
+        bestRankingVariantPoints = variantObject[this.rankingPolicy];
+        bestRankingVariants = [index]
+      } 
+    })
+
+    let bestRankingVariantIndex = bestRankingVariants[0];
+    if (bestRankingVariants.length > 1) {
+      let variantLength = 10000000;
+      bestRankingVariants.forEach((idx) => {
+        if (itemVariants[idx].variant.length < variantLength) {
+          bestRankingVariantIndex = idx;
+          variantLength = itemVariants[idx].variant.length;
+        }
+      })
+    }
+    return bestRankingVariantIndex;
   }
 
   private convertItemVariantToRankedItemVariant(variant: ItemVariantObject | string): RankedItemVariantObject {
