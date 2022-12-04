@@ -3,6 +3,7 @@ import { Item, RankedItem, ItemVariantObject, RankedItemVariantObject, BulletPoi
 import { Resume } from "../model/Resume/Resume";
 import { ResumeSectionEntries, ItemCategory, RankedItemCategory, RankedSectionEntry, SectionEntry } from "../model/Resume/ResumeSectionEntry";
 import { KeywordsMap } from "../model/Keywords";
+import { ResumeSection } from "../model/Resume/ResumeSection";
 
 export class HandleAnalyzeResume {
   private resume: Resume;
@@ -17,12 +18,17 @@ export class HandleAnalyzeResume {
   }
 
   getResumeAnalysis(): Resume {
-    const newSections = this.resume.sections.map((section) => {
+    const newSections: ResumeSection[] = this.resume.sections.map((section) => {
+      const rankedContent = this.getSectionContentAnalysis(section.content);
+      const totalScore = this.tallySectionEntryScores(rankedContent);
       return {
         ...section,
-        content: this.getSectionAnalysis(section.content)
+        content: rankedContent,
+        sumOfTotalScores: totalScore,
+        averageOfTotalScores: totalScore / rankedContent.length
       }
     })
+
     this.processedResume = {
       ...this.resume,
       sections: newSections
@@ -30,20 +36,25 @@ export class HandleAnalyzeResume {
     return this.processedResume;
   }
 
-  getSectionAnalysis(content: ResumeSectionEntries) {
+  getSectionContentAnalysis(content: ResumeSectionEntries) {
     return content.map(this.getSectionEntryAnalysis) as ResumeSectionEntries;
   }
 
+  tallySectionEntryScores(content: ResumeSectionEntries) {
+    return content
+      .map((item: RankedSectionEntry) => item.overallScore)
+      .reduce((a, b) => a + b);
+  }
+
   getSectionEntryAnalysis(sectionEntry: SectionEntry) {
-    const rankedSectionEntry = this.convertItemToRankedItem(sectionEntry);
-    console.log(rankedSectionEntry)
-    //const rankedElement: SectionEntry = this.convertItemToRankedItem(sectionEntry) as SectionEntry;
-    //const accomplishmentRankTally = this.tallySectionEntryRankings(rankedElement);
-    //const rankedSectionEntry: RankedSectionEntry = {
-    //  ...rankedElement as RankedSectionEntry,
-    //  overallRank: accomplishmentRankTally.overallRank,
-    //  rankingStrategy: accomplishmentRankTally.rankingStrategy
-    //}
+    const processedSectionEntry = this.convertItemToRankedItem(sectionEntry) as RankedSectionEntry;
+    
+    const categoryRankTally = this.tallySectionEntryRankings(processedSectionEntry);
+    const rankedSectionEntry: RankedSectionEntry = {
+      ...processedSectionEntry,
+      overallScore: categoryRankTally.overallScore,
+      rankingStrategy: categoryRankTally.rankingStrategy
+    }
     return rankedSectionEntry;
   }
 
@@ -52,7 +63,7 @@ export class HandleAnalyzeResume {
         .sort(this.rankingPolicy === 'totalRank' ? sortInDescendingOrderOfBestRankingVariantTotalPoints : sortInDescendingOrderOfBestRankingVariantAveragePoints);
   }
 
-  convertItemToRankedItem(item: Item): RankedItem {
+  private convertItemToRankedItem(item: Item): RankedItem {
 
     const rankedItemVariants = this.rankItemVariants(item.variants);
     const bestRankingVariantIndex = this.getBestRankingItemVariantIndex(rankedItemVariants);
@@ -124,7 +135,7 @@ export class HandleAnalyzeResume {
     return rankedItemOption;
   }
 
-  tallySectionEntryRankings(sectionEntry: SectionEntry): { overallRank: number, rankingStrategy: "totalRank" | "averageRank" } {
+  private tallySectionEntryRankings(sectionEntry: SectionEntry): { overallScore: number, rankingStrategy: "totalRank" | "averageRank" } {
     let totalRank = 0;
     let rankEntries = 0;
     sectionEntry.itemCategories.forEach((itemCategory: RankedItemCategory) => {
@@ -138,7 +149,7 @@ export class HandleAnalyzeResume {
       rankEntries += 1;
     }) 
     return {
-      overallRank: this.rankingPolicy === 'totalRank' ? totalRank : totalRank / rankEntries,
+      overallScore: this.rankingPolicy === 'totalRank' ? totalRank : totalRank / rankEntries,
       rankingStrategy: this.rankingPolicy
     }
   }
