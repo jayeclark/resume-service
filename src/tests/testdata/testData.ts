@@ -1,7 +1,7 @@
-import { ExternalLinks, Resume } from "../model/Resume/Resume";
-import { ItemCategory, Experience, Job, SectionEntry } from "../model/Resume/ResumeSectionEntry";
-import { BulletPoint, Item, ItemVariantObject } from "../model/Resume/Item";
-import { Industry, RawJobDescription } from "../model/JobDescription";
+import { ExternalLinks, Resume } from "../../model/Resume/Resume";
+import { ItemCategory, Experience, Job, SectionEntry } from "../../model/Resume/ResumeSectionEntry";
+import { BulletPoint, Item, ItemVariantObject } from "../../model/Resume/Item";
+import { Industry, RawJobDescription } from "../../model/JobDescription";
 
 export function generateTestJobDescription(): RawJobDescription {
   return {

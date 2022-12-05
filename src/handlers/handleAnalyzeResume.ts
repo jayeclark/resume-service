@@ -40,16 +40,11 @@ export class HandleAnalyzeResume {
     return content.map(this.getSectionEntryAnalysis) as ResumeSectionEntries;
   }
 
-  tallySectionEntryScores(content: ResumeSectionEntries) {
-    return content
-      .map((item: RankedSectionEntry) => item.overallScore)
-      .reduce((a, b) => a + b);
-  }
 
   getSectionEntryAnalysis(sectionEntry: SectionEntry) {
     const processedSectionEntry = this.convertItemToRankedItem(sectionEntry) as RankedSectionEntry;
     
-    const categoryRankTally = this.tallySectionEntryRankings(processedSectionEntry);
+    const categoryRankTally = this.tallySectionEntryItemRankings(processedSectionEntry);
     const rankedSectionEntry: RankedSectionEntry = {
       ...processedSectionEntry,
       overallScore: categoryRankTally.overallScore,
@@ -135,7 +130,14 @@ export class HandleAnalyzeResume {
     return rankedItemOption;
   }
 
-  private tallySectionEntryRankings(sectionEntry: SectionEntry): { overallScore: number, rankingStrategy: "totalRank" | "averageRank" } {
+
+  private tallySectionEntryScores(content: ResumeSectionEntries) {
+    return content
+      .map((item: RankedSectionEntry) => item.overallScore)
+      .reduce((a, b) => a + b);
+  }
+
+  private tallySectionEntryItemRankings(sectionEntry: SectionEntry): { overallScore: number, rankingStrategy: "totalRank" | "averageRank" } {
     let totalRank = 0;
     let rankEntries = 0;
     sectionEntry.itemCategories.forEach((itemCategory: RankedItemCategory) => {

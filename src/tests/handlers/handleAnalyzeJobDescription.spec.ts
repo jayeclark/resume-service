@@ -1,6 +1,6 @@
 import { describe, it } from "mocha";
 import { expect } from "chai";
-import { generateTestJobDescription } from "../testData";
+import { generateTestJobDescription } from "../testdata/testData";
 import { HandleAnalyzeJobDescription, removeStopWordsFromArray } from "../../handlers/handleAnalyzeJobDescription";
 
 describe('', () => {
