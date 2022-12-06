@@ -11,15 +11,16 @@ interface ContactInfo {
   name: string;
   phone: string;
   location: string;
-  links: [{
+  links: ({
     name: ExternalLinks;
     url: string;
-  }]
+    keywords?: string[];
+  })[]
 }
 
 export interface Resume {
-  interactive: boolean
-  metadata: {
+  interactive?: boolean
+  metadata?: {
     companyName: string;
     position: string;
     applicationDate: Date;

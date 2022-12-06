@@ -5,7 +5,6 @@ export interface RankedItemCategory extends RankedItem { }
 
 export interface SectionEntry extends Item {
   entity: string;
-  role: string;
   start: Date | null;
   end: Date | null;
   items: BulletPoint[] | RankedBulletPoint[];
@@ -18,7 +17,9 @@ export interface RankedSectionEntry extends SectionEntry {
   rankingStrategy: "totalRank" | "averageRank"
 }
 
-export interface Job extends SectionEntry { }
+export interface Job extends SectionEntry {
+  role: string,
+}
 export interface RankedJob extends RankedSectionEntry { }
 
 export interface Project extends SectionEntry { }
