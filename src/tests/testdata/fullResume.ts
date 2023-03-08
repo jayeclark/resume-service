@@ -1,5 +1,5 @@
 import { ExternalLinks, Resume } from "../../model/Resume/Resume";
-import { FULLRESUME_EXPERIENCE } from "./fullresume_experience";
+import { FULLRESUME_EXPERIENCE } from "./fullResume_experience";
 
 
 export const FULL_RESUME: Resume = {

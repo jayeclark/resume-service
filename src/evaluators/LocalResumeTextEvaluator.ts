@@ -17,6 +17,10 @@ export class LocalEvaluator implements Evaluator {
     this.scoringGuide = scoringGuide
   }
 
+  getScoringMode() {
+    return this.scoringMode;
+  }
+  
   validateScoringGuide(scoringGuide: KeywordsMap | KeywordsMapWithDocumentTally): void {
     if (this.scoringMode === LocalScoringMode.WEIGHTED) {
       const words = Object.values(scoringGuide);

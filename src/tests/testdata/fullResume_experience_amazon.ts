@@ -1,4 +1,4 @@
-import { ItemCategory, SectionEntry } from "../../model/Resume/ResumeSectionEntry";
+import { ItemCategory, Job, SectionEntry } from "../../model/Resume/ResumeSectionEntry";
 import { BulletPoint } from "../../model/Resume/Item";
 import { Industry } from "../../model/JobDescription";
 
@@ -105,7 +105,7 @@ const operationalExcellence_pullRequestCount: BulletPoint = {
   ]
 }
 
-export const AMZN: SectionEntry = {
+export const AMZN: Job = {
   id: "amzn",
   entity: "Amazon",
   variants: ["Software Development Engineer"],

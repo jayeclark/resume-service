@@ -5,7 +5,7 @@ import { HandleAnalyzeJobDescription } from "../../handlers/handleAnalyzeJobDesc
 import { HandleAnalyzeResume } from "../../handlers/handleAnalyzeResume";
 import { RankedItem } from "../../model/Resume/Item";
 import { SectionEntry } from "../../model/Resume/ResumeSectionEntry";
-import { LocalEvaluator } from '../../evaluators/LocalEvaluator';
+import { LocalEvaluator } from '../../evaluators/LocalResumeTextEvaluator';
 import { LocalScoringMode } from "../../model/Constants";
 
 describe('RESUME ANALYZER', () => {

@@ -1,7 +1,6 @@
 import { KeywordData } from "../model/Keywords";
 import { RawJobDescription, ProcessedJobDescription, JobDescriptionWeightingRules, Skill } from "../model/JobDescription";
 import { removeStopwords, eng } from "stopword";
-import { isNumberObject } from "util/types";
 
 export class HandleAnalyzeJobDescription {
   private readonly jobDescription: RawJobDescription
@@ -81,7 +80,7 @@ export function removeStopWordsFromArray(array: string[]) {
       .replace(allPunctuation, " ")
       .split(" ")
       .filter((x) => x != "" && !/[0-9]/.test(x));
-    removeStopwords(processedElement).forEach((keyword) => {
+    removeStopwords(processedElement, eng).forEach((keyword) => {
       keywords.push(keyword.toLowerCase());
       if (keyword.charAt(keyword.length - 1) === "s") {
         keywords.push(keyword.toLowerCase().slice(0, keyword.length - 1))

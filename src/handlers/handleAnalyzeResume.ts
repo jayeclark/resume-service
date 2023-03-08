@@ -4,6 +4,7 @@ import { Resume } from "../model/Resume/Resume";
 import { ResumeSectionEntries, ItemCategory, RankedItemCategory, RankedSectionEntry, SectionEntry } from "../model/Resume/ResumeSectionEntry";
 import { ResumeSection, ExperienceSection, EducationSection, SkillsAndCertificationsSection, ProjectsSection } from '../model/Resume/ResumeSection';
 import { Evaluator } from "../evaluators/Evaluator";
+import { LocalScoringMode } from '../model/Constants';
 
 export class HandleAnalyzeResume {
   private resume: Resume;
@@ -29,17 +30,17 @@ export class HandleAnalyzeResume {
   }
 
   processSection<T>(section: ResumeSection): T {
-    const rankedContent = this.getSectionContentAnalysis(section.content);
-      const totalScore = this.tallySectionEntryScores(rankedContent);
-      return {
-        ...section as T,
-        content: rankedContent,
-        sumOfTotalScores: totalScore,
-        averageOfTotalScores: totalScore / rankedContent.length
-      }
+    const rankedContent = this.getSectionEntriesAnalysis(section.content);
+    const totalScore = this.getSectionEntriesScoreTally(rankedContent);
+    return {
+      ...section as T,
+      content: rankedContent,
+      sumOfTotalScores: totalScore,
+      averageOfTotalScores: totalScore / rankedContent.length
+    }
   }
 
-  getSectionContentAnalysis(content: ResumeSectionEntries) {
+  getSectionEntriesAnalysis(content: ResumeSectionEntries) {
     return content.map(this.getSectionEntryAnalysis) as ResumeSectionEntries;
   }
 
@@ -47,7 +48,7 @@ export class HandleAnalyzeResume {
   getSectionEntryAnalysis(sectionEntry: SectionEntry) {
     const processedSectionEntry = this.convertItemToRankedItem(sectionEntry) as RankedSectionEntry;
     
-    const categoryRankTally = this.tallySectionEntryItemRankings(processedSectionEntry);
+    const categoryRankTally = this.getSectionEntryItemsScoreTally(processedSectionEntry);
     const rankedSectionEntry: RankedSectionEntry = {
       ...processedSectionEntry,
       overallScore: categoryRankTally.overallScore,
@@ -56,13 +57,13 @@ export class HandleAnalyzeResume {
   }
 
   private convertItemsToRankedItems(items: BulletPoint[] | ItemCategory[]) {
-    return items.map((item) => this.convertItemToRankedItem(item))
-        .sort(sortInDescendingOrderOfBestRankingVariant);
+    const rankedItems = items.map((item) => this.convertItemToRankedItem(item));
+    const sortedRankedItems = rankedItems.sort(sortInDescendingOrderOfBestRankingVariant);
+    return sortedRankedItems;
   }
 
   private convertItemToRankedItem(item: Item): RankedItem {
-
-    const rankedItemVariants = this.rankItemVariants(item.variants);
+    const rankedItemVariants = this.getRankedItemVariants(item.variants);
     const bestRankingVariantIndex = this.getBestRankingItemVariantIndex(rankedItemVariants);
 
     const rankedItem: RankedItem = {
@@ -71,9 +72,12 @@ export class HandleAnalyzeResume {
       bestRankingVariantIndex
     }
 
+    // If the item contains child nodes, convert those to ranked items as well
     if ("items" in rankedItem) {
       rankedItem.items = this.convertItemsToRankedItems(rankedItem.items as BulletPoint[]);
     }
+
+    // If the item contains category headings that map to certain items, convert them to ranked items
     if ("itemCategories" in rankedItem) {
       rankedItem.itemCategories = this.convertItemsToRankedItems(rankedItem.itemCategories as ItemCategory[]);
     }
@@ -81,7 +85,7 @@ export class HandleAnalyzeResume {
     return rankedItem;
   }
 
-  private rankItemVariants(itemVariants: (ItemVariantObject | RankedItemVariantObject | string)[]) {
+  private getRankedItemVariants(itemVariants: (ItemVariantObject | RankedItemVariantObject | string)[]) {
     return itemVariants.map((variant) => this.convertItemVariantToRankedItemVariant(variant));
   }
 
@@ -89,7 +93,7 @@ export class HandleAnalyzeResume {
     let bestRankingVariants: number[] = [];
     let bestRankingVariantPoints = 0;
 
-    itemVariants.map((variantObject, index) => {
+    itemVariants.forEach((variantObject, index) => {
       if (variantObject.score === bestRankingVariantPoints) {
         bestRankingVariants.push(index);
       }
@@ -99,17 +103,10 @@ export class HandleAnalyzeResume {
       } 
     })
 
-    let bestRankingVariantIndex = bestRankingVariants[0];
-    if (bestRankingVariants.length > 1) {
-      let variantLength = 10000000;
-      bestRankingVariants.forEach((idx) => {
-        if (itemVariants[idx].variant.length < variantLength) {
-          bestRankingVariantIndex = idx;
-          variantLength = itemVariants[idx].variant.length;
-        }
-      })
-    }
-    return bestRankingVariantIndex;
+    // If there are multiple best ranking variants, break the tie based on the length of the variant (less is more)
+    const variantLengths = bestRankingVariants.map((idx: number) => itemVariants[idx].variant.length);
+    const shortestVariant = variantLengths.findIndex((l: number) => l == Math.min(...variantLengths));
+    return shortestVariant;
   }
 
   private convertItemVariantToRankedItemVariant(variant: ItemVariantObject | string): RankedItemVariantObject {
@@ -126,13 +123,13 @@ export class HandleAnalyzeResume {
   }
 
 
-  private tallySectionEntryScores(content: ResumeSectionEntries) {
+  private getSectionEntriesScoreTally(content: ResumeSectionEntries) {
     return content
       .map((item: RankedSectionEntry) => item.overallScore)
       .reduce((a, b) => a + b);
   }
 
-  private tallySectionEntryItemRankings(sectionEntry: SectionEntry): { overallScore: number, sectionRankingStrategy: "total" | "average" } {
+  private getSectionEntryItemsScoreTally(sectionEntry: SectionEntry): { overallScore: number, sectionRankingStrategy: "total" | "average" } {
     let totalScore = 0;
     let scoreEntries = 0;
     sectionEntry.itemCategories.forEach((itemCategory: RankedItemCategory) => {
