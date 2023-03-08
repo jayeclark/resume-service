@@ -1,5 +1,6 @@
 export enum LocalScoringMode {
   total = "total",
   average = "average",
-  log = "log"
+  log = "log",
+  weighted = "weighted"
 }

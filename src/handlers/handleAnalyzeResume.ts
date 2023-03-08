@@ -2,38 +2,40 @@ import { removeStopwords, eng } from "stopword";
 import { Item, RankedItem, ItemVariantObject, RankedItemVariantObject, BulletPoint } from "../model/Resume/Item";
 import { Resume } from "../model/Resume/Resume";
 import { ResumeSectionEntries, ItemCategory, RankedItemCategory, RankedSectionEntry, SectionEntry } from "../model/Resume/ResumeSectionEntry";
-import { KeywordsMap } from "../model/Keywords";
-import { ResumeSection } from "../model/Resume/ResumeSection";
+import { ResumeSection, ExperienceSection, EducationSection, SkillsAndCertificationsSection, ProjectsSection } from '../model/Resume/ResumeSection';
+import { Evaluator } from "../evaluators/Evaluator";
 
 export class HandleAnalyzeResume {
   private resume: Resume;
   private processedResume: Resume;
-  private keywordsMap: KeywordsMap;
-  private rankingPolicy: 'totalRank' | 'averageRank' = "totalRank"
+  private sectionRankingPolicy: 'total' | 'average';
+  private readonly evaluator: Evaluator;
 
-  constructor(resume: Resume, keywordsMap: KeywordsMap, rankingPolicy?: 'totalRank' | 'averageRank') {
+  constructor(resume: Resume, evaluator: Evaluator) {
     this.resume = resume;
-    this.keywordsMap = keywordsMap;
-    if (rankingPolicy) { this.rankingPolicy = rankingPolicy };
   }
 
   getResumeAnalysis(): Resume {
-    const newSections: ResumeSection[] = this.resume.sections.map((section) => {
-      const rankedContent = this.getSectionContentAnalysis(section.content);
-      const totalScore = this.tallySectionEntryScores(rankedContent);
-      return {
-        ...section,
-        content: rankedContent,
-        sumOfTotalScores: totalScore,
-        averageOfTotalScores: totalScore / rankedContent.length
-      }
-    })
+    const newSections: ResumeSection[] = this.resume.sections.map(
+      (section: ExperienceSection | EducationSection | ProjectsSection | SkillsAndCertificationsSection) => this.processSection(section)
+    );
 
     this.processedResume = {
       ...this.resume,
       sections: newSections
     }
     return this.processedResume;
+  }
+
+  processSection<T>(section: ResumeSection): T {
+    const rankedContent = this.getSectionContentAnalysis(section.content);
+      const totalScore = this.tallySectionEntryScores(rankedContent);
+      return {
+        ...section as T,
+        content: rankedContent,
+        sumOfTotalScores: totalScore,
+        averageOfTotalScores: totalScore / rankedContent.length
+      }
   }
 
   getSectionContentAnalysis(content: ResumeSectionEntries) {
@@ -48,14 +50,13 @@ export class HandleAnalyzeResume {
     const rankedSectionEntry: RankedSectionEntry = {
       ...processedSectionEntry,
       overallScore: categoryRankTally.overallScore,
-      rankingStrategy: categoryRankTally.rankingStrategy
     }
     return rankedSectionEntry;
   }
 
   private convertItemsToRankedItems(items: BulletPoint[] | ItemCategory[]) {
     return items.map((item) => this.convertItemToRankedItem(item))
-        .sort(this.rankingPolicy === 'totalRank' ? sortInDescendingOrderOfBestRankingVariantTotalPoints : sortInDescendingOrderOfBestRankingVariantAveragePoints);
+        .sort(sortInDescendingOrderOfBestRankingVariant);
   }
 
   private convertItemToRankedItem(item: Item): RankedItem {
@@ -88,11 +89,11 @@ export class HandleAnalyzeResume {
     let bestRankingVariantPoints = 0;
 
     itemVariants.map((variantObject, index) => {
-      if (variantObject[this.rankingPolicy] === bestRankingVariantPoints) {
+      if (variantObject.score === bestRankingVariantPoints) {
         bestRankingVariants.push(index);
       }
-      if (variantObject[this.rankingPolicy] > bestRankingVariantPoints) {
-        bestRankingVariantPoints = variantObject[this.rankingPolicy];
+      if (variantObject.score > bestRankingVariantPoints) {
+        bestRankingVariantPoints = variantObject.score;
         bestRankingVariants = [index]
       } 
     })
@@ -113,19 +114,12 @@ export class HandleAnalyzeResume {
   private convertItemVariantToRankedItemVariant(variant: ItemVariantObject | string): RankedItemVariantObject {
     const variantObject = typeof variant === 'string' ? { variant } : variant;
     const optionContentKeywordArray = removeStopwords(variantObject.variant.split(' ').map((word) => word.toLowerCase()), eng);
-    let totalPoints = 0;
-    let matchedWords = 0;
 
-    optionContentKeywordArray.forEach((word: string) => {
-      if (word in this.keywordsMap) {
-        totalPoints += this.keywordsMap[word].totalWeight;
-        matchedWords += 1;
-      }
-    })
+    const score = this.evaluator.evaluateText(optionContentKeywordArray)
+
     const rankedItemOption: RankedItemVariantObject = {
       ...variantObject,
-      totalRank: totalPoints,
-      averageRank: totalPoints > 0 ? totalPoints / matchedWords : 0
+      score,
     }
     return rankedItemOption;
   }
@@ -137,34 +131,28 @@ export class HandleAnalyzeResume {
       .reduce((a, b) => a + b);
   }
 
-  private tallySectionEntryItemRankings(sectionEntry: SectionEntry): { overallScore: number, rankingStrategy: "totalRank" | "averageRank" } {
-    let totalRank = 0;
-    let rankEntries = 0;
+  private tallySectionEntryItemRankings(sectionEntry: SectionEntry): { overallScore: number, sectionRankingStrategy: "total" | "average" } {
+    let totalScore = 0;
+    let scoreEntries = 0;
     sectionEntry.itemCategories.forEach((itemCategory: RankedItemCategory) => {
       const bestRankingCategoryVariantIndex = itemCategory.bestRankingVariantIndex;
-      totalRank += itemCategory.variants[bestRankingCategoryVariantIndex][this.rankingPolicy];
-      rankEntries += 1;
+      totalScore += itemCategory.variants[bestRankingCategoryVariantIndex].score;
+      scoreEntries += 1;
     })
     sectionEntry.items.forEach((item: RankedItem) => {
       const index = item.bestRankingVariantIndex;
-      totalRank += item.variants[index][this.rankingPolicy]
-      rankEntries += 1;
+      totalScore += item.variants[index].score
+      scoreEntries += 1;
     }) 
     return {
-      overallScore: this.rankingPolicy === 'totalRank' ? totalRank : totalRank / rankEntries,
-      rankingStrategy: this.rankingPolicy
+      overallScore: this.sectionRankingPolicy === 'total' ? totalScore : totalScore / scoreEntries,
+      sectionRankingStrategy: this.sectionRankingPolicy
     }
   }
 }
 
-function sortInDescendingOrderOfBestRankingVariantTotalPoints(a: RankedItem, b: RankedItem) {
+function sortInDescendingOrderOfBestRankingVariant(a: RankedItem, b: RankedItem) {
   const [aBestVariant, bBestVariant] = [a.bestRankingVariantIndex, b.bestRankingVariantIndex]
   const [aVariants, bVariants] = [a.variants as RankedItemVariantObject[], b.variants as RankedItemVariantObject[]];
   return bVariants[bBestVariant].totalRank - aVariants[aBestVariant].totalRank
-}
-
-function sortInDescendingOrderOfBestRankingVariantAveragePoints(a: RankedItem, b: RankedItem) {
-  const [aBestVariant, bBestVariant] = [a.bestRankingVariantIndex, b.bestRankingVariantIndex]
-  const [aVariants, bVariants] = [a.variants as RankedItemVariantObject[], b.variants as RankedItemVariantObject[]];
-  return bVariants[bBestVariant].averageRank - aVariants[aBestVariant].averageRank
 }

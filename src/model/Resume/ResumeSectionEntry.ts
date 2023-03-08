@@ -14,7 +14,6 @@ export interface SectionEntry extends Item {
 export interface RankedSectionEntry extends SectionEntry {
   bestRankingVariantIndex: number;
   overallScore: number
-  rankingStrategy: "totalRank" | "averageRank"
 }
 
 export interface Job extends SectionEntry {

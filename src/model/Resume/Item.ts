@@ -28,8 +28,7 @@ export interface ItemVariantObject extends Record<string, any>{
 }
 
 export interface RankedItemVariantObject extends ItemVariantObject {
-  totalRank: number
-  averageRank: number
+  score: number
 }
 
 export interface RankedItem extends Item {
