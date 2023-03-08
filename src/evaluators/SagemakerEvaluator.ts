@@ -1,0 +1,1 @@
+// Placeholder for evaluator that calls Sagemaker multimodel endpoint to retrieve score
