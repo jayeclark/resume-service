@@ -12,13 +12,13 @@ export class LocalEvaluator implements Evaluator {
   private readonly scoringGuide: KeywordsMap | KeywordsMapWithDocumentTally;
 
   constructor({ scoringMode, scoringGuide }: LocalEvaluatorProps) {
-    this.scoringMode = scoringMode || LocalScoringMode.total
+    this.scoringMode = scoringMode || LocalScoringMode.TOTAL
     this.validateScoringGuide(scoringGuide);
     this.scoringGuide = scoringGuide
   }
 
   validateScoringGuide(scoringGuide: KeywordsMap | KeywordsMapWithDocumentTally): void {
-    if (this.scoringMode === LocalScoringMode.weighted) {
+    if (this.scoringMode === LocalScoringMode.WEIGHTED) {
       const words = Object.values(scoringGuide);
       if (!words.every((word: KeywordData | KeywordDataWithDocumentTally) => 'countInDocument' in word)) {
         throw new Error("Must provide a valid scoring guide with document tallies if using weighted scoring!")
@@ -28,11 +28,11 @@ export class LocalEvaluator implements Evaluator {
 
   evaluateText(text: string[]): number {
     switch (this.scoringMode) {
-      case LocalScoringMode.total:
+      case LocalScoringMode.TOTAL:
         return this.getTextScoreTotal(text).totalWeight;
-      case LocalScoringMode.average:
+      case LocalScoringMode.AVERAGE:
         return this.getTextScoreAverage(text);
-      case LocalScoringMode.log:
+      case LocalScoringMode.LOG:
         return this.getTextScoreLog(text);
       default:
         return this.getTextScoreTotal(text).totalWeight;
