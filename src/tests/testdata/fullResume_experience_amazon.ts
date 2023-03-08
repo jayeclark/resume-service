@@ -5,7 +5,9 @@ import { Industry } from "../../model/JobDescription";
 const AMZN_refundAuditor: ItemCategory = {
   id: "refund-auditor",
   variants: [
-    { variant: "Kotlin, AWS Lambda & DynamoDB auditing service project for automated refunds" }
+    "nonsense",
+    "more nonsense",
+    "Kotlin, AWS Lambda & DynamoDB auditing service project for automated refunds"
   ],
 }
 

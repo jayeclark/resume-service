@@ -5,6 +5,8 @@ import { HandleAnalyzeJobDescription } from "../../handlers/handleAnalyzeJobDesc
 import { HandleAnalyzeResume } from "../../handlers/handleAnalyzeResume";
 import { RankedItem } from "../../model/Resume/Item";
 import { SectionEntry } from "../../model/Resume/ResumeSectionEntry";
+import { LocalEvaluator } from '../../evaluators/LocalEvaluator';
+import { LocalScoringMode } from "../../model/Constants";
 
 describe('RESUME ANALYZER', () => {
   it('generate expected results from getSectionEntryAnalysis', () => {
@@ -21,8 +23,12 @@ describe('RESUME ANALYZER', () => {
 
     jobAnalyzer.processJobDescription(null)
     const map = jobAnalyzer.getJobDescriptionKeywordsMap();
+    const evaluator = new LocalEvaluator({
+      scoringMode: LocalScoringMode.TOTAL,
+      scoringGuide: map,
+    })
     
-    const resumeAnalyzer = new HandleAnalyzeResume(resume, map);
+    const resumeAnalyzer = new HandleAnalyzeResume(resume, evaluator);
     //console.log(resumeAnalyzer);
 
     const resumeSectionEntry = resume.sections[0].content[0];
@@ -50,8 +56,12 @@ describe('RESUME ANALYZER', () => {
 
     jobAnalyzer.processJobDescription(null)
     const map = jobAnalyzer.getJobDescriptionKeywordsMap();
+    const evaluator = new LocalEvaluator({
+      scoringMode: LocalScoringMode.TOTAL,
+      scoringGuide: map,
+    })
     
-    const resumeAnalyzer = new HandleAnalyzeResume(resume, map);
+    const resumeAnalyzer = new HandleAnalyzeResume(resume, evaluator);
     //console.log(resumeAnalyzer);
 
     const resumeSectionEntry = resume.sections[0].content[0];

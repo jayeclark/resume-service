@@ -13,6 +13,7 @@ export class HandleAnalyzeResume {
 
   constructor(resume: Resume, evaluator: Evaluator) {
     this.resume = resume;
+    this.evaluator = evaluator;
   }
 
   getResumeAnalysis(): Resume {
