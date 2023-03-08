@@ -1,21 +1,32 @@
 import { LocalScoringMode } from "../model/Constants";
-import { KeywordsMap } from '../model/Keywords';
+import { KeywordsMap, KeywordsMapWithDocumentTally, KeywordDataWithDocumentTally, KeywordData } from '../model/Keywords';
+import { Evaluator } from "./Evaluator";
 
 interface LocalEvaluatorProps {
   scoringMode?: LocalScoringMode;
-  scoringGuide: KeywordsMap;
+  scoringGuide: KeywordsMap | KeywordsMapWithDocumentTally;
 }
 
-export class LocalEvaluator {
+export class LocalEvaluator implements Evaluator {
   private readonly scoringMode: LocalScoringMode;
-  private readonly scoringGuide: KeywordsMap;
+  private readonly scoringGuide: KeywordsMap | KeywordsMapWithDocumentTally;
 
   constructor({ scoringMode, scoringGuide }: LocalEvaluatorProps) {
     this.scoringMode = scoringMode || LocalScoringMode.total
+    this.validateScoringGuide(scoringGuide);
     this.scoringGuide = scoringGuide
   }
 
-  evaluateText(text: String[]) {
+  validateScoringGuide(scoringGuide: KeywordsMap | KeywordsMapWithDocumentTally): void {
+    if (this.scoringMode === LocalScoringMode.weighted) {
+      const words = Object.values(scoringGuide);
+      if (!words.every((word: KeywordData | KeywordDataWithDocumentTally) => 'countInDocument' in word)) {
+        throw new Error("Must provide a valid scoring guide with document tallies if using weighted scoring!")
+      }
+    }
+  }
+
+  evaluateText(text: string[]): number {
     switch (this.scoringMode) {
       case LocalScoringMode.total:
         return this.getTextScoreTotal(text).totalWeight;
@@ -24,8 +35,17 @@ export class LocalEvaluator {
       case LocalScoringMode.log:
         return this.getTextScoreLog(text);
       default:
-        return this.getTextScoreTotal(text);
+        return this.getTextScoreTotal(text).totalWeight;
     }
+  }
+
+  countMatchedKeywords(text: string[], seenCount: KeywordsMap): void {
+    text.forEach((word: string) => {
+      if (!(seenCount[word]?.countInDocument)) {
+        seenCount[word].countInDocument = 0;
+      }
+      seenCount[word].countInDocument += 1
+    })
   }
 
   getTextScoreTotal(text: String[]) {
