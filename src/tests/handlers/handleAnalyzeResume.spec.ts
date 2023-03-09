@@ -5,7 +5,7 @@ import { HandleAnalyzeJobDescription } from "../../handlers/handleAnalyzeJobDesc
 import { HandleAnalyzeResume } from "../../handlers/handleAnalyzeResume";
 import { RankedItem } from "../../model/Resume/Item";
 import { SectionEntry } from "../../model/Resume/ResumeSectionEntry";
-import { LocalEvaluator } from '../../evaluators/LocalResumeTextEvaluator';
+import { LocalResumeEvaluator } from '../../evaluators/LocalResumeTextEvaluator';
 import { LocalScoringMode } from "../../model/Constants";
 
 describe('RESUME ANALYZER', () => {
@@ -23,7 +23,7 @@ describe('RESUME ANALYZER', () => {
 
     jobAnalyzer.processJobDescription(null)
     const map = jobAnalyzer.getJobDescriptionKeywordsMap();
-    const evaluator = new LocalEvaluator({
+    const evaluator = new LocalResumeEvaluator({
       scoringMode: LocalScoringMode.TOTAL,
       scoringGuide: map,
     })
@@ -56,7 +56,7 @@ describe('RESUME ANALYZER', () => {
 
     jobAnalyzer.processJobDescription(null)
     const map = jobAnalyzer.getJobDescriptionKeywordsMap();
-    const evaluator = new LocalEvaluator({
+    const evaluator = new LocalResumeEvaluator({
       scoringMode: LocalScoringMode.TOTAL,
       scoringGuide: map,
     })

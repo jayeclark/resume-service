@@ -1,13 +1,15 @@
 import { LocalScoringMode } from "../model/Constants";
 import { KeywordsMap, KeywordsMapWithDocumentTally, KeywordDataWithDocumentTally, KeywordData } from '../model/Keywords';
-import { Evaluator } from "./Evaluator";
+import { ResumeEvaluator } from "./Evaluator";
+import { ItemVariantObject, RankedItemVariantObject } from '../model/Resume/Item';
+import { removeStopwords, eng } from 'stopword';
 
 interface LocalEvaluatorProps {
   scoringMode?: LocalScoringMode;
   scoringGuide: KeywordsMap | KeywordsMapWithDocumentTally;
 }
 
-export class LocalEvaluator implements Evaluator {
+export class LocalResumeEvaluator implements ResumeEvaluator {
   private readonly scoringMode: LocalScoringMode;
   private readonly scoringGuide: KeywordsMap | KeywordsMapWithDocumentTally;
 
@@ -30,7 +32,13 @@ export class LocalEvaluator implements Evaluator {
     }
   }
 
-  evaluateText(text: string[]): number {
+  evaluate(item: ItemVariantObject): RankedItemVariantObject {
+    const optionContentKeywordArray = removeStopwords(item.variant.split(' ').map((word) => word.toLowerCase()), eng);
+    const score = this.getVariantScore(optionContentKeywordArray);
+    return { ...item, score }
+  }
+
+  getVariantScore(text: string[]): number {
     switch (this.scoringMode) {
       case LocalScoringMode.TOTAL:
         return this.getTextScoreTotal(text).totalWeight;

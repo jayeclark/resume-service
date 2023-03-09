@@ -111,15 +111,7 @@ export class HandleAnalyzeResume {
 
   private convertItemVariantToRankedItemVariant(variant: ItemVariantObject | string): RankedItemVariantObject {
     const variantObject = typeof variant === 'string' ? { variant } : variant;
-    const optionContentKeywordArray = removeStopwords(variantObject.variant.split(' ').map((word) => word.toLowerCase()), eng);
-
-    const score = this.evaluator.evaluateText(optionContentKeywordArray)
-
-    const rankedItemOption: RankedItemVariantObject = {
-      ...variantObject,
-      score,
-    }
-    return rankedItemOption;
+    return this.evaluator.evaluate(variantObject);
   }
 
 
