@@ -1,10 +1,8 @@
-import { removeStopwords, eng } from "stopword";
 import { Item, RankedItem, ItemVariantObject, RankedItemVariantObject, BulletPoint } from "../model/Resume/Item";
 import { Resume } from "../model/Resume/Resume";
 import { ResumeSectionEntries, ItemCategory, RankedItemCategory, RankedSectionEntry, SectionEntry } from "../model/Resume/ResumeSectionEntry";
 import { ResumeSection, ExperienceSection, EducationSection, SkillsAndCertificationsSection, ProjectsSection } from '../model/Resume/ResumeSection';
 import { Evaluator } from "../evaluators/Evaluator";
-import { LocalScoringMode } from '../model/Constants';
 
 export class HandleAnalyzeResume {
   private resume: Resume;
@@ -66,8 +64,6 @@ export class HandleAnalyzeResume {
     const rankedItemVariants = this.getRankedItemVariants(item.variants);
     const bestRankingVariantIndex = this.getBestRankingItemVariantIndex(rankedItemVariants);
 
-    console.log(bestRankingVariantIndex);
-
     const rankedItem: RankedItem = {
       ...item,
       variants: rankedItemVariants,
@@ -81,7 +77,6 @@ export class HandleAnalyzeResume {
 
     // If the item contains category headings that map to certain items, convert them to ranked items
     if ("itemCategories" in rankedItem) {
-      console.log("item categories")
       rankedItem.itemCategories = this.convertItemsToRankedItems(rankedItem.itemCategories as ItemCategory[]);
     }
 
@@ -93,6 +88,13 @@ export class HandleAnalyzeResume {
   }
 
   private getBestRankingItemVariantIndex(itemVariants: RankedItemVariantObject[]) {
+    const bestRankingVariantIndices: number[] = this.getIndexesOfAllVariantsWithHighestScore(itemVariants);
+    const shortestTopRankedVariant = this.getIndexOfTopScoringVariantWithShortestLength(itemVariants, bestRankingVariantIndices)
+    
+    return shortestTopRankedVariant;
+  }
+
+  private getIndexesOfAllVariantsWithHighestScore(itemVariants: RankedItemVariantObject[]): number[] {
     let bestRankingVariantIndices: number[] = [];
     let bestRankingVariantPoints = 0;
     itemVariants.forEach((variantObject, index) => {
@@ -105,11 +107,13 @@ export class HandleAnalyzeResume {
         bestRankingVariantIndices = [index]
       } 
     })
+    return bestRankingVariantIndices;
+  }
 
-    // If there are multiple best ranking variants, break the tie based on the length of the variant (less is more)
+  private getIndexOfTopScoringVariantWithShortestLength(itemVariants: RankedItemVariantObject[], bestRankingVariantIndices: number[]) {
     const variantLengths = bestRankingVariantIndices.map((idx: number) => itemVariants[idx].variant.length);
     const shortestVariant = variantLengths.findIndex((l: number) => l == Math.min(...variantLengths));
-    return bestRankingVariantIndices[shortestVariant];
+    return bestRankingVariantIndices[shortestVariant]
   }
 
   private convertItemVariantToRankedItemVariant(variant: ItemVariantObject | string): RankedItemVariantObject {
