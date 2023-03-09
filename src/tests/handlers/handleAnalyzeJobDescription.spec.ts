@@ -1,7 +1,9 @@
 import { describe, it } from "mocha";
 import { expect } from "chai";
 import { generateTestJobDescription } from "../testdata/testData";
-import { HandleAnalyzeJobDescription, removeStopWordsFromArray } from "../../handlers/handleAnalyzeJobDescription";
+import { HandleAnalyzeJobDescription } from "../../handlers/handleAnalyzeJobDescription";
+import { LocalScoringMode } from '../../model/Constants';
+import { LocalJobDescriptionEvaluator } from "../../evaluators/LocalJobDescriptionEvaluator";
 
 describe('', () => {
   it('remove stop words from description generates expected output', () => {
@@ -13,9 +15,12 @@ describe('', () => {
       culture: 10, 
       skills: 20
     }
-    const jobAnalyzer = new HandleAnalyzeJobDescription(jobDescription, jobDescriptionWeightingRules)
+    const jobDescriptionEvaluator = new LocalJobDescriptionEvaluator({
+      scoringMode: LocalScoringMode.TOTAL,
+      weights: jobDescriptionWeightingRules
+    })
 
-    const withoutStopWords = jobAnalyzer.processJobDescription(null)
+    const jobAnalyzer = new HandleAnalyzeJobDescription(jobDescription, jobDescriptionEvaluator)
 
     const map = jobAnalyzer.getJobDescriptionKeywordsMap();
     console.log(Object.keys(map).length)

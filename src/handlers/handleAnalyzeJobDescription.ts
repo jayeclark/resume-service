@@ -1,47 +1,32 @@
 import { KeywordData } from "../model/Keywords";
 import { RawJobDescription, ProcessedJobDescription, JobDescriptionWeightingRules, Skill } from "../model/JobDescription";
 import { removeStopwords, eng } from "stopword";
+import { JobDescriptionEvaluator } from '../evaluators/Evaluator';
 
 export class HandleAnalyzeJobDescription {
   private readonly jobDescription: RawJobDescription
-  private weighting: JobDescriptionWeightingRules
-  private processedJobDescription: ProcessedJobDescription | null
+  private evaluator: JobDescriptionEvaluator
+  private readonly processedJobDescription: ProcessedJobDescription | null
   
-  constructor(jobDescription: RawJobDescription, weighting: JobDescriptionWeightingRules) {
+  constructor(jobDescription: RawJobDescription, evaluator: JobDescriptionEvaluator) {
     this.jobDescription = jobDescription;
-    this.weighting = weighting;
+    this.evaluator = evaluator;
+    this.processedJobDescription = this.getProcessedJobDescription()
   }
 
   getRawJobDescription() {
     return this.jobDescription;
   }
 
-  getProcessedJobDescription(weighting?: JobDescriptionWeightingRules): ProcessedJobDescription {
-    if (this.processedJobDescription !== null && !weighting) {
+  getProcessedJobDescription(): ProcessedJobDescription {
+    if (this.processedJobDescription) {
       return this.processedJobDescription;
     }
-    this.processJobDescription(weighting)
-    return this.processedJobDescription;
+    return this.removeStopWordsFromJobDescription();;
   }
 
-  getJobDescriptionKeywordsMap(weighting?: JobDescriptionWeightingRules) {
-    if (weighting) {
-      this.setWeighting(weighting);
-    }
-    return this.tallyJobDescriptionKeywords();
-  }
-
-  setWeighting(weighting: JobDescriptionWeightingRules) {
-    this.weighting = weighting;
-  }
-
-  getCurrentWeighting() {
-    return this.weighting;
-  }
-
-  processJobDescription(weighting: JobDescriptionWeightingRules | null) {
-    if (weighting !== null) this.setWeighting(weighting);
-    this.removeStopWordsFromJobDescription();
+  getJobDescriptionKeywordsMap() {
+    return this.evaluator.evaluate(this.getProcessedJobDescription())
   }
 
   private removeStopWordsFromJobDescription() {
@@ -52,20 +37,7 @@ export class HandleAnalyzeJobDescription {
       role: removeStopWordsFromArray(this.jobDescription.role),
       culture: removeStopWordsFromArray(this.jobDescription.culture),
     };
-    this.processedJobDescription = jobDescriptionWithoutStopWords
-  }
-
-  private tallyJobDescriptionKeywords() {
-    const keywords: Record<string, KeywordData> = {};
-    ["required", "preferred", "role", "culture"].forEach((property) => {
-      (this.processedJobDescription[property] as string[]).forEach((word) => {
-        addToTally(keywords, word, this.weighting[property])
-      })
-    })
-    this.processedJobDescription.skills
-      .filter((skill: Skill) => skill.importance > 0)
-      .forEach((skill: Skill) => addToTally(keywords, skill.name, skill.importance * this.weighting.skills / 3))
-    return keywords;
+    return jobDescriptionWithoutStopWords
   }
 }
 
@@ -89,12 +61,4 @@ export function removeStopWordsFromArray(array: string[]) {
     
   });
   return keywords.length === 0 ? ([] as string[]) : keywords;
-}
-
-function addToTally(tallyObject: Record<string, KeywordData>, word: string, weight: number) {
-    if (!(word in tallyObject)) {
-      tallyObject[word] = { count: 0, totalWeight: 0 };
-    }
-    tallyObject[word].count += 1;
-    tallyObject[word].totalWeight += weight;
 }
