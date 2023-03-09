@@ -17,9 +17,9 @@ export class LocalJobDescriptionEvaluator implements JobDescriptionEvaluator {
   private readonly scoringMode: LocalScoringMode;
   private readonly weights: Record<JobDescriptionProperty, number>
 
-  constructor({ scoringMode, weights }: LocalJobDescriptionEvaluatorProps) {
-    this.scoringMode = scoringMode || LocalScoringMode.TOTAL
-    this.weights = weights || {
+  constructor(props?: LocalJobDescriptionEvaluatorProps) {
+    this.scoringMode = props?.scoringMode || LocalScoringMode.TOTAL
+    this.weights = props?.weights || {
       required: 2,
       preferred: 1, 
       role: 1, 

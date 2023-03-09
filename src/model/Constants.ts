@@ -4,3 +4,8 @@ export enum LocalScoringMode {
   LOG = "log",
   WEIGHTED = "weighted"
 }
+
+export enum ResumeAnalysisMode {
+  LOCAL = "local",
+  SERVER = "server"
+}

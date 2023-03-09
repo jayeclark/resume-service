@@ -1,64 +1,18 @@
-import { KeywordData } from "../model/Keywords";
-import { RawJobDescription, ProcessedJobDescription, JobDescriptionWeightingRules, Skill } from "../model/JobDescription";
-import { removeStopwords, eng } from "stopword";
-import { JobDescriptionEvaluator } from '../evaluators/Evaluator';
+import { RawJobDescription } from '../model/JobDescription';
+import { KeywordsMap } from '../model/Keywords';
+import { ResumeAnalysisMode } from '../model/Constants';
+import { LocalJobDescriptionEvaluator } from '../evaluators/LocalJobDescriptionEvaluator';
+import { SagemakerResumeTextEvaluator } from '../evaluators/SagemakerResumeTextEvaluator';
 
-export class HandleAnalyzeJobDescription {
-  private readonly jobDescription: RawJobDescription
-  private evaluator: JobDescriptionEvaluator
-  private readonly processedJobDescription: ProcessedJobDescription | null
-  
-  constructor(jobDescription: RawJobDescription, evaluator: JobDescriptionEvaluator) {
-    this.jobDescription = jobDescription;
-    this.evaluator = evaluator;
-    this.processedJobDescription = this.getProcessedJobDescription()
+export function handleAnalyzeJobDescription(
+  jobDescription: RawJobDescription,
+  mode: ResumeAnalysisMode,
+  authedUser?: any, // TODO: Fix/create type
+): KeywordsMap {
+  const evaluator = mode === ResumeAnalysisMode.LOCAL ? new LocalJobDescriptionEvaluator() : new SagemakerResumeTextEvaluator();
+  const keywordsMap = evaluator.evaluate(jobDescription);
+  if (authedUser) {
+    // Placeholder - Save job description analysis
   }
-
-  getRawJobDescription() {
-    return this.jobDescription;
-  }
-
-  getProcessedJobDescription(): ProcessedJobDescription {
-    if (this.processedJobDescription) {
-      return this.processedJobDescription;
-    }
-    return this.removeStopWordsFromJobDescription();;
-  }
-
-  getJobDescriptionKeywordsMap() {
-    return this.evaluator.evaluate(this.getProcessedJobDescription())
-  }
-
-  private removeStopWordsFromJobDescription() {
-    const jobDescriptionWithoutStopWords: ProcessedJobDescription = {
-      ...this.jobDescription,
-      required: removeStopWordsFromArray(this.jobDescription.required),
-      preferred: removeStopWordsFromArray(this.jobDescription.preferred),
-      role: removeStopWordsFromArray(this.jobDescription.role),
-      culture: removeStopWordsFromArray(this.jobDescription.culture),
-    };
-    return jobDescriptionWithoutStopWords
-  }
-}
-
-export function removeStopWordsFromArray(array: string[]) {
-  const keywords: string[] = [];
-  array.forEach((element: string) => {
-    const allPunctuation = new RegExp(/[+.,\-()!]/, "g")
-    const processedElement = element
-      .replace(/\s&\s/g, "&")
-      .replace(/\s\-\s/g, " ")
-      .replace(/\-/g, "")
-      .replace(allPunctuation, " ")
-      .split(" ")
-      .filter((x) => x != "" && !/[0-9]/.test(x));
-    removeStopwords(processedElement, eng).forEach((keyword) => {
-      keywords.push(keyword.toLowerCase());
-      if (keyword.charAt(keyword.length - 1) === "s") {
-        keywords.push(keyword.toLowerCase().slice(0, keyword.length - 1))
-      }
-    })
-    
-  });
-  return keywords.length === 0 ? ([] as string[]) : keywords;
+  return keywordsMap; // Will be used to generate a word cloud in addition to resume building.
 }
