@@ -1,7 +1,7 @@
 import { describe, it } from "mocha";
 import { expect } from "chai";
 import { generateTestJobDescription } from "../testdata/testData";
-import { HandleAnalyzeJobDescription } from "../../handlers/handleAnalyzeJobDescription";
+import { JobDescriptionAnalyzer } from "../../analyzers/JobDescriptionAnalyzer";
 import { LocalScoringMode } from '../../model/Constants';
 import { LocalJobDescriptionEvaluator } from "../../evaluators/LocalJobDescriptionEvaluator";
 
@@ -20,7 +20,7 @@ describe('', () => {
       weights: jobDescriptionWeightingRules
     })
 
-    const jobAnalyzer = new HandleAnalyzeJobDescription(jobDescription, jobDescriptionEvaluator)
+    const jobAnalyzer = new JobDescriptionAnalyzer(jobDescription, jobDescriptionEvaluator)
 
     const map = jobAnalyzer.getJobDescriptionKeywordsMap();
     console.log(Object.keys(map).length)

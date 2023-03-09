@@ -1,8 +1,8 @@
 import { describe, it } from "mocha";
 import { expect } from "chai";
 import { generateTestJobDescription, generateTestResume } from "../testdata/testData";
-import { HandleAnalyzeJobDescription } from "../../handlers/handleAnalyzeJobDescription";
-import { HandleAnalyzeResume } from "../../handlers/handleAnalyzeResume";
+import { JobDescriptionAnalyzer } from "../../analyzers/JobDescriptionAnalyzer";
+import { ResumeAnalyzer } from "../../analyzers/ResumeAnalyzer";
 import { RankedItem } from "../../model/Resume/Item";
 import { SectionEntry } from "../../model/Resume/ResumeSectionEntry";
 import { LocalResumeEvaluator } from '../../evaluators/LocalResumeTextEvaluator';
@@ -24,7 +24,7 @@ describe('RESUME ANALYZER', () => {
       scoringMode: LocalScoringMode.TOTAL,
       weights: jobDescriptionWeightingRules
     })
-    const jobAnalyzer = new HandleAnalyzeJobDescription(jobDescription, jobDescriptionEvaluator)
+    const jobAnalyzer = new JobDescriptionAnalyzer(jobDescription, jobDescriptionEvaluator)
 
     const map = jobAnalyzer.getJobDescriptionKeywordsMap();
     const resumeEvaluator = new LocalResumeEvaluator({
@@ -32,7 +32,7 @@ describe('RESUME ANALYZER', () => {
       scoringGuide: map,
     })
     
-    const resumeAnalyzer = new HandleAnalyzeResume(resume, resumeEvaluator);
+    const resumeAnalyzer = new ResumeAnalyzer(resume, resumeEvaluator);
     //console.log(resumeAnalyzer);
 
     const resumeSectionEntry = resume.sections[0].content[0];
@@ -61,7 +61,7 @@ describe('RESUME ANALYZER', () => {
       scoringMode: LocalScoringMode.TOTAL,
       weights: jobDescriptionWeightingRules
     })
-    const jobAnalyzer = new HandleAnalyzeJobDescription(jobDescription, jobDescriptionEvaluator)
+    const jobAnalyzer = new JobDescriptionAnalyzer(jobDescription, jobDescriptionEvaluator)
 
 
     const map = jobAnalyzer.getJobDescriptionKeywordsMap();
@@ -70,7 +70,7 @@ describe('RESUME ANALYZER', () => {
       scoringGuide: map,
     })
     
-    const resumeAnalyzer = new HandleAnalyzeResume(resume, evaluator);
+    const resumeAnalyzer = new ResumeAnalyzer(resume, evaluator);
     //console.log(resumeAnalyzer);
 
     const resumeSectionEntry = resume.sections[0].content[0];
