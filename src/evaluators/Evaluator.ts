@@ -1,4 +1,4 @@
-import { RawJobDescription, ProcessedJobDescription } from '../model/JobDescription';
+import { ProcessedJobDescription } from '../model/JobDescription';
 import { LocalScoringMode } from '../model/Constants';
 import { ItemVariantObject, RankedItemVariantObject } from '../model/Resume/Item';
 import { KeywordsMap } from '../model/Keywords';
