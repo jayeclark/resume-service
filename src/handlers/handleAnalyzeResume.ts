@@ -66,6 +66,8 @@ export class HandleAnalyzeResume {
     const rankedItemVariants = this.getRankedItemVariants(item.variants);
     const bestRankingVariantIndex = this.getBestRankingItemVariantIndex(rankedItemVariants);
 
+    console.log(bestRankingVariantIndex);
+
     const rankedItem: RankedItem = {
       ...item,
       variants: rankedItemVariants,
@@ -79,6 +81,7 @@ export class HandleAnalyzeResume {
 
     // If the item contains category headings that map to certain items, convert them to ranked items
     if ("itemCategories" in rankedItem) {
+      console.log("item categories")
       rankedItem.itemCategories = this.convertItemsToRankedItems(rankedItem.itemCategories as ItemCategory[]);
     }
 
@@ -90,23 +93,23 @@ export class HandleAnalyzeResume {
   }
 
   private getBestRankingItemVariantIndex(itemVariants: RankedItemVariantObject[]) {
-    let bestRankingVariants: number[] = [];
+    let bestRankingVariantIndices: number[] = [];
     let bestRankingVariantPoints = 0;
-
     itemVariants.forEach((variantObject, index) => {
+      
       if (variantObject.score === bestRankingVariantPoints) {
-        bestRankingVariants.push(index);
+        bestRankingVariantIndices.push(index);
       }
       if (variantObject.score > bestRankingVariantPoints) {
         bestRankingVariantPoints = variantObject.score;
-        bestRankingVariants = [index]
+        bestRankingVariantIndices = [index]
       } 
     })
 
     // If there are multiple best ranking variants, break the tie based on the length of the variant (less is more)
-    const variantLengths = bestRankingVariants.map((idx: number) => itemVariants[idx].variant.length);
+    const variantLengths = bestRankingVariantIndices.map((idx: number) => itemVariants[idx].variant.length);
     const shortestVariant = variantLengths.findIndex((l: number) => l == Math.min(...variantLengths));
-    return shortestVariant;
+    return bestRankingVariantIndices[shortestVariant];
   }
 
   private convertItemVariantToRankedItemVariant(variant: ItemVariantObject | string): RankedItemVariantObject {

@@ -7,6 +7,7 @@ import { RankedItem } from "../../model/Resume/Item";
 import { SectionEntry } from "../../model/Resume/ResumeSectionEntry";
 import { LocalResumeEvaluator } from '../../evaluators/LocalResumeTextEvaluator';
 import { LocalScoringMode } from "../../model/Constants";
+import { LocalJobDescriptionEvaluator } from '../../evaluators/LocalJobDescriptionEvaluator';
 
 describe('RESUME ANALYZER', () => {
   it('generate expected results from getSectionEntryAnalysis', () => {
@@ -19,22 +20,26 @@ describe('RESUME ANALYZER', () => {
       culture: 10, 
       skills: 20
     }
-    const jobAnalyzer = new HandleAnalyzeJobDescription(jobDescription, jobDescriptionWeightingRules)
+    const jobDescriptionEvaluator = new LocalJobDescriptionEvaluator({
+      scoringMode: LocalScoringMode.TOTAL,
+      weights: jobDescriptionWeightingRules
+    })
+    const jobAnalyzer = new HandleAnalyzeJobDescription(jobDescription, jobDescriptionEvaluator)
 
-    jobAnalyzer.processJobDescription(null)
     const map = jobAnalyzer.getJobDescriptionKeywordsMap();
-    const evaluator = new LocalResumeEvaluator({
+    const resumeEvaluator = new LocalResumeEvaluator({
       scoringMode: LocalScoringMode.TOTAL,
       scoringGuide: map,
     })
     
-    const resumeAnalyzer = new HandleAnalyzeResume(resume, evaluator);
+    const resumeAnalyzer = new HandleAnalyzeResume(resume, resumeEvaluator);
     //console.log(resumeAnalyzer);
 
     const resumeSectionEntry = resume.sections[0].content[0];
 
     const sectionEntryAnalysis = resumeAnalyzer.getSectionEntryAnalysis(resumeSectionEntry) as SectionEntry;
     console.log(sectionEntryAnalysis);
+    console.log(sectionEntryAnalysis.itemCategories[0].variants)
     const { variants, bestRankingVariantIndex } = sectionEntryAnalysis.items[0];
     const items: RankedItem[] = sectionEntryAnalysis.items as RankedItem[];
     const sortedVariants = items.sort((a: RankedItem, b: RankedItem) => {
@@ -52,9 +57,13 @@ describe('RESUME ANALYZER', () => {
       culture: 10, 
       skills: 20
     }
-    const jobAnalyzer = new HandleAnalyzeJobDescription(jobDescription, jobDescriptionWeightingRules)
+    const jobDescriptionEvaluator = new LocalJobDescriptionEvaluator({
+      scoringMode: LocalScoringMode.TOTAL,
+      weights: jobDescriptionWeightingRules
+    })
+    const jobAnalyzer = new HandleAnalyzeJobDescription(jobDescription, jobDescriptionEvaluator)
 
-    jobAnalyzer.processJobDescription(null)
+
     const map = jobAnalyzer.getJobDescriptionKeywordsMap();
     const evaluator = new LocalResumeEvaluator({
       scoringMode: LocalScoringMode.TOTAL,
